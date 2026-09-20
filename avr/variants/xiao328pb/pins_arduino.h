@@ -56,19 +56,24 @@
 #define LED_BUILTIN_ACTIVE LOW
 static const uint8_t LED = LED_BUILTIN;
 
-// Only XIAO positions with physical ADC capability get Ax aliases.
+// Analog aliases follow ascending digital pin numbers.
+// A0-A5 are on the XIAO header; A6/A7 are internal PC2/PC3.
 #define PIN_A0 D0
-#define PIN_A4 D4
-#define PIN_A5 D5
-#define PIN_A8 D8
-#define PIN_A9 D9
-#define PIN_A10 D10
+#define PIN_A1 D4
+#define PIN_A2 D5
+#define PIN_A3 D8
+#define PIN_A4 D9
+#define PIN_A5 D10
+#define PIN_A6 PIN_PC2
+#define PIN_A7 PIN_PC3
 static const uint8_t A0 = PIN_A0;
+static const uint8_t A1 = PIN_A1;
+static const uint8_t A2 = PIN_A2;
+static const uint8_t A3 = PIN_A3;
 static const uint8_t A4 = PIN_A4;
 static const uint8_t A5 = PIN_A5;
-static const uint8_t A8 = PIN_A8;
-static const uint8_t A9 = PIN_A9;
-static const uint8_t A10 = PIN_A10;
+static const uint8_t A6 = PIN_A6;
+static const uint8_t A7 = PIN_A7;
 // ADC channel aliases also expose the two internal/test-point channels.
 #define PIN_ADC0 PIN_PC0
 #define PIN_ADC1 PIN_PC1
@@ -78,7 +83,8 @@ static const uint8_t A10 = PIN_A10;
 #define PIN_ADC5 PIN_PC5
 #define PIN_ADC6 PIN_PE2
 #define PIN_ADC7 PIN_PE3
-#define analogInputToDigitalPin(p) ((p)==0 ? PIN_PC0 : (p)==1 ? PIN_PC1 : (p)==2 ? PIN_PC2 : (p)==3 ? PIN_PC3 : (p)==4 ? PIN_PC4 : (p)==5 ? PIN_PC5 : (p)==6 ? PIN_PE2 : (p)==7 ? PIN_PE3 : -1)
+// Logical analog index (0..7), not the physical ADC channel.
+#define analogInputToDigitalPin(p) ((p)==0 ? PIN_A0 : (p)==1 ? PIN_A1 : (p)==2 ? PIN_A2 : (p)==3 ? PIN_A3 : (p)==4 ? PIN_A4 : (p)==5 ? PIN_A5 : (p)==6 ? PIN_A6 : (p)==7 ? PIN_A7 : -1)
 // analogRead accepts board pin numbers, including the Ax / PIN_ADCx aliases.
 #define analogPinToChannel(p) ((p)==PIN_PC0 ? 0 : (p)==PIN_PC1 ? 1 : (p)==PIN_PC2 ? 2 : (p)==PIN_PC3 ? 3 : (p)==PIN_PC4 ? 4 : (p)==PIN_PC5 ? 5 : (p)==PIN_PE2 ? 6 : (p)==PIN_PE3 ? 7 : -1)
 #define digitalPinHasPWM(p) ((p)==PIN_PD0 || (p)==PIN_PD1 || (p)==PIN_PD2 || (p)==PIN_PD3 || (p)==PIN_PD5 || (p)==PIN_PD6 || (p)==PIN_PB1 || (p)==PIN_PB2 || (p)==PIN_PB3)

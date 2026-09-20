@@ -19,13 +19,19 @@ static_assert(SS1 == SS && MOSI1 == MOSI && MISO1 == MISO && SCK1 == SCK, "SPI1 
 static_assert(PIN_SPI0_MOSI == D6 && PIN_SPI0_MISO == D7, "SPI0 shared with UART1");
 static_assert(digitalPinToInterrupt(D1) == 0 && digitalPinToInterrupt(D2) == 1, "EXTINT");
 static_assert(digitalPinToInterrupt(D0) == NOT_AN_INTERRUPT, "No false EXTINT");
-static_assert(analogPinToChannel(A0) == 6 && analogPinToChannel(A4) == 4 && analogPinToChannel(A5) == 5, "ADC map");
-static_assert(analogPinToChannel(A8) == 1 && analogPinToChannel(A9) == 0 && analogPinToChannel(A10) == 7, "ADC map");
+static_assert(A0 == D0 && A1 == D4 && A2 == D5 && A3 == D8 && A4 == D9 && A5 == D10, "Sequential header analog aliases");
+static_assert(A6 == PIN_PC2 && A7 == PIN_PC3, "Internal analog aliases");
+static_assert(analogPinToChannel(A0) == 6 && analogPinToChannel(A1) == 4 && analogPinToChannel(A2) == 5, "ADC map A0-A2");
+static_assert(analogPinToChannel(A3) == 1 && analogPinToChannel(A4) == 0 && analogPinToChannel(A5) == 7, "ADC map A3-A5");
+static_assert(analogPinToChannel(A6) == 2 && analogPinToChannel(A7) == 3, "ADC map A6-A7");
+static_assert(analogPinToChannel(4) == 4 && analogPinToChannel(A4) == 0, "Numeric pin 4 remains D4, A4 is D9");
+static_assert(PIN_WIRE0_SDA == A1 && PIN_WIRE0_SCL == A2, "I2C aliases remain D4/D5");
 static_assert(analogPinToChannel(D1) == -1 && analogPinToChannel(D2) == -1 && analogPinToChannel(D3) == -1, "No fictitious ADC");
 static_assert(LED_BUILTIN == PIN_PD5 && LED_BUILTIN_ACTIVE == LOW, "User LED");
-#define ADC_ROUNDTRIP(n) static_assert(analogPinToChannel(analogInputToDigitalPin(n)) == n, "ADC round trip")
+#define ADC_ROUNDTRIP(n) static_assert(analogInputToDigitalPin(n) == A##n, "Logical analog index"); static_assert(analogPinToChannel(PIN_ADC##n) == n, "Physical ADC channel")
 ADC_ROUNDTRIP(0); ADC_ROUNDTRIP(1); ADC_ROUNDTRIP(2); ADC_ROUNDTRIP(3);
 ADC_ROUNDTRIP(4); ADC_ROUNDTRIP(5); ADC_ROUNDTRIP(6); ADC_ROUNDTRIP(7);
+static_assert(analogInputToDigitalPin(-1) == -1 && analogInputToDigitalPin(8) == -1, "Invalid analog index");
 static_assert(digitalPinHasPWM(D1) && digitalPinHasPWM(D2) && digitalPinHasPWM(D3) && digitalPinHasPWM(D6), "Header PWM");
 static_assert(!digitalPinHasPWM(D0) && !digitalPinHasPWM(D4) && !digitalPinHasPWM(D5) && !digitalPinHasPWM(D7) && !digitalPinHasPWM(D8) && !digitalPinHasPWM(D9) && !digitalPinHasPWM(D10), "Non-PWM header");
 

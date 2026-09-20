@@ -8,6 +8,6 @@ void setup() {
   Wire.begin(); // I2C0: D4/D5
   SPI.begin();  // SPI1: D8/D9/D10; D0 becomes hardware SS output
   Serial.println(PIN_WIRE0_SDA);
-  Serial.println(analogRead(A9)); // D9 / PC0 / ADC0
+  Serial.println(analogRead(A4)); // D9 / PC0 / ADC0
 }
 void loop() {}

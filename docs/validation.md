@@ -1,3 +1,12 @@
+# 0.3.0 検証内容
+
+- A0～A5をD0/D4/D5/D8/D9/D10の順へ変更。A6/A7は内部PC2/PC3。
+- PinAuditでA番号→D番号→物理ADCチャンネルと、数値4とA4の違いを静的検証。
+- analogInputToDigitalPinの論理A番号変換、PIN_ADCxの物理チャンネル指定を検証。
+- D番号・通信ピン・27 GPIOテーブルは変更なし。
+- 公開前にActionsで単独インストール、サンプル、ELF照合、ISP設定を検証。
+- 実機でのADC動作は未検証。
+
 # 0.2.0 検証記録
 
 - submoduleからMiniCoreを取り込んだ配布物を、空のArduino環境へインストール。

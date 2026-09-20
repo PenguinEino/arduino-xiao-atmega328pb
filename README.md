@@ -13,7 +13,7 @@ Arduino IDE 2.x（内蔵Arduino CLI 1.0.4以降）を使用します。
    https://raw.githubusercontent.com/PenguinEino/arduino-xiao-atmega328pb/main/package_atmegagokan_index.json
    ```
 
-2. ボードマネージャで **ATmega Gokan XIAO 0.2.0以降** をインストールします。
+2. ボードマネージャで **ATmega Gokan XIAO 0.3.0以降** をインストールします。
 3. ボードに **ATmega Gokan XIAO (ATmega328PB, 16 MHz)**、ポートに基板のUSBシリアルを選びます。
 4. **ファイル → スケッチ例 → ATmegaGokan → Blink** でコンパイル・書き込みします。
 
@@ -39,17 +39,24 @@ Urboot導入後はUSBシリアルから書き込めます。既存の旧Optiboot
 | D1 / 1 | PD2 | INT0 | — | Timer4B |
 | D2 / 2 | PD3 | INT1 | — | Timer2B |
 | D3 / 3 | PB1 | GPIO | — | Timer1A |
-| D4 / 4 | PC4 | Wire SDA | A4 | — |
-| D5 / 5 | PC5 | Wire SCL | A5 | — |
+| D4 / 4 | PC4 | Wire SDA | A1 | — |
+| D5 / 5 | PC5 | Wire SCL | A2 | — |
 | D6 / 6 | PB3 | Serial1 TX / SPI0 MOSI | — | Timer2A |
 | D7 / 7 | PB4 | Serial1 RX / SPI0 MISO | — | — |
-| D8 / 8 | PC1 | SPI SCK (SPI1) | A8 | — |
-| D9 / 9 | PC0 | SPI MISO (SPI1) | A9 | — |
-| D10 / 10 | PE3 | SPI MOSI (SPI1) | A10 | — |
+| D8 / 8 | PC1 | SPI SCK (SPI1) | A3 | — |
+| D9 / 9 | PC0 | SPI MISO (SPI1) | A4 | — |
+| D10 / 10 | PE3 | SPI MOSI (SPI1) | A5 | — |
 
 `analogRead(A0)` / `analogRead(D0)` / `analogRead(0)` はすべてPE2のADC6を読みます。
 数値をADCチャンネル番号として解釈しません。`PIN_ADC0`～`PIN_ADC7` で物理ADCチャンネルからGPIO番号を得られます。
-**D1～D3にはADCがないため、A1～A3は定義していません。** XIAO全機種の機能互換ではありません。
+A0～A5は、ADC対応ヘッダ端子をD番号の小さい順に連番にしています。
+A6=PC2（数値14）、A7=PC3（数値15）は内部ピンで、XIAOヘッダには出ていません。
+`analogInputToDigitalPin(0..7)` はこのA番号をGPIO番号へ変換します。
+D1～D3にはADCがありません。A1はD4、A2はD5、A3はD8を指します。
+
+**0.3.0でA番号を変更しました。** 旧A4→新A1、旧A5→新A2、旧A8→新A3、旧A9→新A4、旧A10→新A5です。
+旧A8/A9/A10は削除しています。D番号・`PIN_ADCx`・通信ピンマクロは変更していません。
+例: `analogRead(4)` は引き続きD4/ADC4ですが、`analogRead(A4)` はD9/ADC0です。
 ADCを持たないピンを`analogRead()`に渡さないでください。
 
 `PIN_PB3`など、MCUポート名のマクロも利用できます。
@@ -121,7 +128,7 @@ MiniCoreのライセンスと参照元情報も配布物に収録します。
 リリース手順は次のとおりです。
 
 1. `avr/platform.txt`とサンプルライブラリのバージョンを更新してmainへpush。
-2. 同じバージョンのタグ（例: `v0.2.0`）をmainの先端に付けてpush。
+2. 同じバージョンのタグ（例: `v0.3.0`）をmainの先端に付けてpush。
 3. **Publish board package** Actionsがsubmodule取得 → 生成 → クリーンインストール検証 → GitHub Release公開 → mainの登録用JSON更新を自動実行します。
 
 通常のpush/PRでも、MiniCoreを別途インストールしない環境で配布物を検証します。
