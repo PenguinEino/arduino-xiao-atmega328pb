@@ -1,0 +1,3 @@
+[submodule "upstream/MiniCore"]
+	path = upstream/MiniCore
+	url = https://github.com/MCUdude/MiniCore.git

@@ -1,0 +1,4 @@
+name=ATmega Gokan XIAO
+version=0.1.0
+# Arduino IDE 2.x / CLI >= 1.0.4: inherit MiniCore recipes and script paths.
+runtime.use_core_platform_path_for_runtime_platform_path=true

@@ -1,0 +1,30 @@
+name: Compile and verify pin mapping
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: arduino/setup-arduino-cli@v2
+        with:
+          version: '1.4.1'
+      - name: Install separately managed MiniCore
+        run: |
+          arduino-cli core update-index --additional-urls https://mcudude.github.io/MiniCore/package_MCUdude_MiniCore_index.json
+          arduino-cli core install MiniCore:avr@3.1.3 --additional-urls https://mcudude.github.io/MiniCore/package_MCUdude_MiniCore_index.json
+          mkdir -p "$HOME/Arduino/hardware/atmegagokan"
+          ln -s "$GITHUB_WORKSPACE/avr" "$HOME/Arduino/hardware/atmegagokan/avr"
+      - name: Compile examples and audit
+        run: |
+          for sketch in avr/libraries/ATmegaGokan/examples/*; do
+            arduino-cli compile --fqbn atmegagokan:avr:xiao328pb "$sketch"
+          done
+          arduino-cli compile --fqbn atmegagokan:avr:xiao328pb --build-path .build/audit tests/PinAudit
+          python3 scripts/check_elf.py .build/audit/PinAudit.ino.elf --avr-bin "$HOME/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin"
+          arduino-cli compile --fqbn atmegagokan:avr:xiao328pb:bootloader=isp,LTO=disabled tests/PinAudit
+      - name: Check package contains no upstream implementation
+        run: python3 scripts/package.py

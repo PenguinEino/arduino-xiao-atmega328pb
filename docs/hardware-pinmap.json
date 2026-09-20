@@ -1,0 +1,74 @@
+{
+  "schematic": "atmega328pb-bmc-qfn/atmega328pb-bmc-qfn.kicad_sch",
+  "sha256": "4821c61efe51ac734ec414ff63b8178cb5586b3b3bcfa9092f61c726492961f9",
+  "mcu": "ATmega328PB-M",
+  "clock_hz": 16000000,
+  "header": [
+    {
+      "digital": 0,
+      "header_pad": 1,
+      "mcu_pad": 19,
+      "port": "PE2"
+    },
+    {
+      "digital": 1,
+      "header_pad": 2,
+      "mcu_pad": 32,
+      "port": "PD2"
+    },
+    {
+      "digital": 2,
+      "header_pad": 3,
+      "mcu_pad": 1,
+      "port": "PD3"
+    },
+    {
+      "digital": 3,
+      "header_pad": 4,
+      "mcu_pad": 13,
+      "port": "PB1"
+    },
+    {
+      "digital": 4,
+      "header_pad": 5,
+      "mcu_pad": 27,
+      "port": "PC4"
+    },
+    {
+      "digital": 5,
+      "header_pad": 6,
+      "mcu_pad": 28,
+      "port": "PC5"
+    },
+    {
+      "digital": 6,
+      "header_pad": 7,
+      "mcu_pad": 15,
+      "port": "PB3"
+    },
+    {
+      "digital": 7,
+      "header_pad": 8,
+      "mcu_pad": 16,
+      "port": "PB4"
+    },
+    {
+      "digital": 8,
+      "header_pad": 9,
+      "mcu_pad": 24,
+      "port": "PC1"
+    },
+    {
+      "digital": 9,
+      "header_pad": 10,
+      "mcu_pad": 23,
+      "port": "PC0"
+    },
+    {
+      "digital": 10,
+      "header_pad": 11,
+      "mcu_pad": 22,
+      "port": "PE3"
+    }
+  ]
+}
