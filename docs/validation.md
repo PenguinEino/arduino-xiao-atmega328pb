@@ -1,3 +1,15 @@
+# 0.2.0 検証記録
+
+- submoduleからMiniCoreを取り込んだ配布物を、空のArduino環境へインストール。
+- `core install atmegagokan:avr@0.2.0` のみ実行し、MiniCore platformが別途インストールされていないことを確認。
+- コンパイラ・avrdude等が依存ツールとして自動取得されることを確認。
+- Blink、PinMacros、SerialBridge、PinAudit、ISP/LTO無効設定のコンパイルを検証。
+- ELF内の27 GPIO、11本のヘッダ接続、PWMテーブルを検証。
+- Actionsは同じ単独インストール検証に成功してからReleaseと登録用JSONを公開。
+- 実機動作は未検証。
+
+以下は旧版の記録です。
+
 # 0.1.0 検証記録
 
 - Arduino IDE付属CLI 1.4.1、macOS arm64で検証。

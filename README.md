@@ -13,14 +13,13 @@ Arduino IDE 2.x（内蔵Arduino CLI 1.0.4以降）を使用します。
    https://raw.githubusercontent.com/PenguinEino/arduino-xiao-atmega328pb/main/package_atmegagokan_index.json
    ```
 
-2. ボードマネージャで **MiniCore 3.1.3** をインストールします。
-3. **ATmega Gokan XIAO (install MiniCore first)** をインストールします。
-4. ボードに **ATmega Gokan XIAO (ATmega328PB, 16 MHz)**、ポートに基板のUSBシリアルを選びます。
-5. **ファイル → スケッチ例 → ATmegaGokan → Blink** でコンパイル・書き込みします。
+2. ボードマネージャで **ATmega Gokan XIAO 0.2.0以降** をインストールします。
+3. ボードに **ATmega Gokan XIAO (ATmega328PB, 16 MHz)**、ポートに基板のUSBシリアルを選びます。
+4. **ファイル → スケッチ例 → ATmegaGokan → Blink** でコンパイル・書き込みします。
 
-登録URLは1つ、インストールするパッケージは2つです。MiniCore本体をこのパッケージに同梱していません。
-同じURLにMiniCoreの公式配布先を参照するメタデータを収録しています。
-MiniCoreを既にインストール済みなら、手順2でバージョンを確認してください。
+登録URLは1つ、インストールするボードパッケージも1つです。MiniCoreを別途インストールする必要はありません。
+コンパイラや書込ツールはボードマネージャが自動取得します。
+0.1.0からはボードマネージャの更新で移行できます。既存のMiniCoreは他のボード用に残しても問題ありません。
 
 **未書き込みのMCUは、最初の1回だけISPで「ブートローダを書き込む」が必要です。**
 ISPのみで使う場合は「Upload method」で `ISP (no bootloader)` を選び、スケッチの「書込装置を使って書き込む」を使います。
@@ -86,7 +85,7 @@ void loop() {}
 MiniCore形式の `PIN_WIRE_SDA0` / `PIN_SPI_MOSI1` などの別名、`SDA`、`SCL`、`SS`、`MOSI`、`MISO`、`SCK` も使用できます。
 `SERIAL_PORT_MONITOR`は`Serial`、`SERIAL_PORT_HARDWARE_OPEN`は`Serial1`です。
 
-`SPI.h`は小さなアダプターで、**別途インストールしたMiniCoreのSPI1実装**を使用します。
+`SPI.h`は小さなアダプターで、**リリースに組み込んだMiniCoreのSPI1実装**を使用します。
 `SPI` / `SPIClass` / `SPISettings` と `SPI1` / `SPI1Class` / `SPI1Settings` は同じバスを扱います。
 `SPI.begin()`はハードウェアSSのD0も出力にするため、SPI使用中のD0はADC入力と兼用できません。
 他の端子をデバイス用CSに使う場合もD0の出力設定が必要です。
@@ -97,14 +96,15 @@ SPI0とSerial1はPB3/PB4を共有します。マクロの存在だけで機能�
 
 ## MiniCoreとの関係
 
-- `upstream/MiniCore` は公式リポジトリへの **Git submodule**。検証対象をv3.1.3のcommitに固定しています。
-- `build.core=MiniCore:MCUdude_corefiles` で、Arduino環境にインストール済みのcoreを参照します。
-- ビルド手順・書込ツール・ブートローダ・Wire・SPI1等もインストール済みMiniCoreから参照します。
-- 配布アーカイブにcore、MiniCore本体、ブートローダ、ツールチェーンを含めません。
-- submoduleの固定は開発・検証用です。Arduinoのcore参照自体はバージョン制約を指定できないため、IDE側でも3.1.3を選んでください。
-- Arduinoのパッケージ仕様にはplatform間の自動インストール依存関係がないため、MiniCoreを先にインストールします。
+- `upstream/MiniCore` は公式リポジトリへの **Git submodule**。v3.1.3のcommitを固定しています。
+- ソース管理ではMiniCoreをコピーせず、GitHub Actionsがsubmoduleを取得します。
+- リリース生成時にMiniCoreのcore・ライブラリ・ブートローダ・ビルド手順と独自variantを組み合わせます。
+- 配布アーカイブには動作に必要なMiniCoreの実装が含まれます。Arduino IDEはこのアーカイブを取得するため、Gitやsubmoduleの操作は不要です。
+- MiniCore本体は無改変。標準SPIだけは独自アダプターでSPI1へ接続します。
+- ツールチェーンは公式配布先を参照する`toolsDependencies`として指定し、IDEが自動取得します。
+- リポジトリのGitHub標準「Source code (zip)」にはsubmodule本体が含まれないため、ボードマネージャではActions生成のアーカイブを使います。
 
-参考: [Arduino core/tool reference](https://docs.arduino.cc/arduino-cli/platform-specification/#referencing-another-core-variant-or-tool)、[公式MiniCore](https://github.com/MCUdude/MiniCore)。
+参考: [Arduino package index](https://docs.arduino.cc/arduino-cli/package_index_json-specification)、[公式MiniCore](https://github.com/MCUdude/MiniCore)。
 
 ## 開発・リリース
 
@@ -114,24 +114,34 @@ cd arduino-xiao-atmega328pb
 python3 scripts/package.py
 ```
 
-`dist/`にvariantのみのアーカイブと統合indexを生成します。ビルドはPython標準ライブラリのみで再現できます。
-リリース時はアーカイブをGitHub Releaseへアップロードし、生成indexをリポジトリ直下へ反映します。
-新バージョンでは`avr/platform.txt`・サンプルライブラリのバージョンを更新し、`--version`で指定してください。
-既存のリリースアーカイブは差し替えず、新しいバージョンを公開します。
+`dist/`にMiniCoreとvariantを組み合わせたアーカイブと登録用JSONを生成します。
+Python標準ライブラリのみで再現でき、submoduleのcommitが`upstream/lock.json`と異なる場合や変更がある場合は停止します。
+MiniCoreのライセンスと参照元情報も配布物に収録します。
+
+リリース手順は次のとおりです。
+
+1. `avr/platform.txt`とサンプルライブラリのバージョンを更新してmainへpush。
+2. 同じバージョンのタグ（例: `v0.2.0`）をmainの先端に付けてpush。
+3. **Publish board package** Actionsがsubmodule取得 → 生成 → クリーンインストール検証 → GitHub Release公開 → mainの登録用JSON更新を自動実行します。
+
+通常のpush/PRでも、MiniCoreを別途インストールしない環境で配布物を検証します。
+既存リリースを差し替えず、新しいバージョンのタグを使用してください。
 
 ```sh
+# ローカルで、パッケージの生成・単独インストール・コンパイルを検証
+python3 scripts/smoke_test.py --cli arduino-cli
+
+# 公開済みパッケージを使う場合
 URL=https://raw.githubusercontent.com/PenguinEino/arduino-xiao-atmega328pb/main/package_atmegagokan_index.json
 arduino-cli core update-index --additional-urls "$URL"
-arduino-cli core install MiniCore:avr@3.1.3 --additional-urls "$URL"
 arduino-cli core install atmegagokan:avr --additional-urls "$URL"
 arduino-cli compile --fqbn atmegagokan:avr:xiao328pb tests/PinAudit
 ```
 
-`tests/PinAudit`はコンパイル・ピン定義検証用です。未接続ピンや複数周辺回路を扱うので実機テストとして実行しないでください。
-`scripts/check_elf.py`はコンパイル済みELF内の27ピンのテーブルを調べ、回路図由来の`docs/hardware-pinmap.json`と11本のヘッダ信号を照合します。
-GitHub Actionsでも別途インストールしたMiniCoreを使ってコンパイルします。
+`tests/PinAudit`はコンパイル・ピン定義検証用です。そのまま実機で実行しないでください。
+`scripts/check_elf.py`はELF内の27ピンのテーブルと回路図由来の11本のヘッダ接続を照合します。
 実機での書き込み・通信・ADC・PWM動作は未検証です。
 
 ## ライセンス
 
-このvariantおよびSPIアダプターはLGPL-2.1-or-later。MiniCore本体は別リポジトリにあり、各ファイルのライセンスに従います。
+このvariantおよびSPIアダプターはLGPL-2.1-or-later。MiniCoreは別リポジトリから取得してリリースに収録し、各ファイルのライセンスに従います。

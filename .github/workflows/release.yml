@@ -1,0 +1,49 @@
+name: Publish board package
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: board-package-release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: arduino/setup-arduino-cli@v2
+        with:
+          version: '1.4.1'
+      - name: Validate version and source
+        id: version
+        shell: bash
+        run: |
+          version=$(sed -n 's/^version=//p' avr/platform.txt)
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then test "$GITHUB_REF_NAME" = "v$version"; fi
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$GITHUB_SHA"
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+      - name: Test clean single-package install
+        run: python3 scripts/smoke_test.py
+      - name: Publish release archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          gh release create "v$VERSION" "dist/atmegagokan-avr-$VERSION.tar.bz2" --target "$GITHUB_SHA" --title "v$VERSION — ATmega Gokan XIAO" --notes "Install ATmega Gokan XIAO only. MiniCore is assembled from the pinned Git submodule. Clean installation and compilation tested by GitHub Actions. See README for setup."
+      - name: Update Boards Manager index
+        run: |
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$GITHUB_SHA"
+          git switch -C main origin/main
+          cp dist/package_atmegagokan_index.json package_atmegagokan_index.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package_atmegagokan_index.json
+          git commit -m 'Update Boards Manager index [skip ci]'
+          git push origin main
